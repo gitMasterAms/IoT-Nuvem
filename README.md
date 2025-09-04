@@ -1,6 +1,6 @@
-# Nome da Sua Aplicação Flask
+# IoT-Nuvem
 
-Uma breve descrição sobre o que sua aplicação faz.
+Utiliza conceitos de IoT e Nuvem para controlar um dispositivo físico virtualmente
 
 ## 🚀 Como Rodar a Aplicação
 
