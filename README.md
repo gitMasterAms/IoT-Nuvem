@@ -3,9 +3,6 @@
 
 ### Uma interface web moderna para controlar um radar via Arduino com Flask.
 
-![Gif da Interface Web em Ação](https://placehold.co/800x400/1a202c/9f7aea?text=Insira+um+GIF+do+seu+projeto+aqui!)
-> ✨ **Dica:** Grave um GIF da tela para mostrar seu projeto funcionando! Ferramentas como [ScreenToGif](https://www.screentogif.com/) ou [LiceCap](https://www.cockos.com/licecap/) são ótimas para isso.
-
 ---
 
 ## 🎯 O Que é Este Projeto?
@@ -75,8 +72,8 @@ Siga os passos abaixo para executar a aplicação na sua máquina.
 Abra seu terminal e clone este projeto para a sua máquina.
 
 ```bash
-git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
-cd SEU_REPOSITORIO
+git clone https://github.com/gitMasterAms/IoT-Nuvem.git
+cd IoT-Nuvem
 ````
 
 ### Passo 2: Ative o Ambiente Virtual `virtualIoTNuvem`
@@ -152,5 +149,5 @@ Você verá a interface de controle do radar. Teste enviando algumas coordenadas
 
 ---
 
-Feito com ❤️ por [Seu Nome Aqui].
+Feito pela Turma AMS.
 
