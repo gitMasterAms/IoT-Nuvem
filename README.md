@@ -1,76 +1,165 @@
-# IoT-Nuvem
 
-Utiliza conceitos de IoT e Nuvem para controlar um dispositivo físico virtualmente
+-----
 
-## 🚀 Como Rodar a Aplicação
+### Código-fonte para o seu arquivo `README.md`:
 
-Siga os passos abaixo para configurar e executar a aplicação em seu ambiente local.
+```markdown
+# 📡 Controle de Radar: Da Área de Trabalho para a Web 🚀
 
----
+### Uma interface web moderna para controlar um radar via Arduino com Flask.
 
-### Passo 1: Configurar o Ambiente Virtual
-
-É altamente recomendado usar um ambiente virtual para isolar as dependências do projeto. Isso evita conflitos com outras bibliotecas instaladas em seu sistema.
-
-1.  **Navegue até o diretório do projeto** no seu terminal.
-2.  **Crie o ambiente virtual** com o seguinte comando:
-    ```bash
-    python -m venv venv
-    ```
-    *Se estiver usando Python 3, o comando pode ser `python3 -m venv venv`.*
-3.  **Ative o ambiente virtual**:
-    * **No Windows**:
-        ```bash
-        venv\Scripts\activate
-        ```
-    * **No macOS e Linux**:
-        ```bash
-        source venv/bin/activate
-        ```
-
-Você saberá que o ambiente está ativo quando o nome `(venv)` aparecer no início da linha de comando.
+![Gif da Interface Web em Ação](https://placehold.co/800x400/1a202c/9f7aea?text=Insira+um+GIF+do+seu+projeto+aqui!)
+> ✨ **Dica:** Grave um GIF da tela para mostrar seu projeto funcionando! Ferramentas como [ScreenToGif](https://www.screentogif.com/) ou [LiceCap](https://www.cockos.com/licecap/) são ótimas para isso.
 
 ---
 
-### Passo 2: Instalar as Dependências
+## 🎯 O Que é Este Projeto?
 
-Com o ambiente virtual ativado, instale todas as bibliotecas necessárias para o projeto.
+Este projeto é uma modernização de um aplicativo de controle de radar. A aplicação original, baseada em uma interface gráfica desktop com Tkinter, foi completamente migrada para uma **plataforma web utilizando Flask**.
 
-1.  Crie um arquivo chamado **`requirements.txt`** na raiz do seu projeto.
-2.  Adicione as dependências listadas abaixo ao arquivo:
-    ```
-    Flask
-    Flask-WTF
-    ```
-    *Se sua aplicação tiver outras dependências, como **`Pillow`** para manipular imagens ou **`SQLAlchemy`** para banco de dados, adicione-as aqui.*
+O objetivo é permitir o controle de um sistema de radar (conectado a um Arduino) através de qualquer navegador, oferecendo uma experiência de usuário mais flexível, acessível e moderna.
 
-3.  Agora, instale as dependências usando o `pip`:
-    ```bash
-    pip install -r requirements.txt
-    ```
+## ⚙️ Como Funciona?
+
+A arquitetura conecta a interface web ao hardware físico de forma simples e eficiente:
+
+```
+
+[ Usuário no Navegador ]
+|
+(Envia coordenadas H/V via HTTP)
+|
+v
+[   Servidor Flask (Python)   ]
+|
+(Usa a biblioteca PySerial)
+|
+v
+[      Porta Serial (COM5)      ]
+|
+(Envia e recebe dados: "15.2 -8.1\\n")
+|
+v
+[         Arduino UNO         ]
+|
+(Controla os motores do radar)
+|
+v
+[      Máquina Física (Radar)      ]
+
+````
+
+1.  **Frontend (Interface de Controle):** Uma página web limpa, construída com HTML e Tailwind CSS, onde o usuário digita as distâncias horizontal e vertical.
+2.  **Backend (Servidor Flask):** O servidor em Python recebe os dados do navegador, valida as coordenadas (H: -20 a 20, V: -12 a 12) e os formata para envio.
+3.  **A Ponte (PySerial):** Esta biblioteca é a responsável por "traduzir" os comandos do Python para a linguagem que o Arduino entende, enviando-os pela porta serial.
+4.  **Hardware (Arduino):** O microcontrolador recebe os comandos e aciona os motores para posicionar o radar com precisão. Ele também pode enviar mensagens de status de volta para o log da aplicação.
 
 ---
 
-### Passo 3: Executar a Aplicação
+## 🛠️ Tecnologias Utilizadas
 
-Com todas as dependências instaladas, você pode iniciar a aplicação.
-
-1.  **Certifique-se de que o ambiente virtual está ativado.** Se não estiver, use os comandos do **Passo 1**.
-2.  Execute o arquivo principal da aplicação:
-    ```bash
-    python app.py
-    ```
-    *Ou `python3 app.py` se for o caso.*
-
-A aplicação estará rodando no endereço `http://127.0.0.1:5000`. Abra seu navegador e acesse a URL para visualizar a página inicial.
-
-Para parar a execução, pressione `CTRL + C` no terminal.
+-   **Backend:** Python, Flask
+-   **Comunicação Hardware:** PySerial
+-   **Frontend:** HTML5, Tailwind CSS
+-   **Hardware:** Arduino
 
 ---
 
-### Desativando o Ambiente Virtual
+## 🚀 Mão na Massa: Rodando o Projeto Localmente
 
-Quando terminar de trabalhar, você pode desativar o ambiente virtual digitando o seguinte comando:
+Siga os passos abaixo para executar a aplicação na sua máquina.
+
+### Pré-requisitos
+
+-   [Python 3.8+](https://www.python.org/downloads/) instalado.
+-   Um Arduino com o código de controle já carregado na placa.
+-   Git para clonar o projeto.
+
+### Passo 1: Clone o Repositório
+
+Abra seu terminal e clone este projeto para a sua máquina.
 
 ```bash
-deactivate
+git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
+cd SEU_REPOSITORIO
+````
+
+### Passo 2: Ative o Ambiente Virtual `virtualIoTNuvem`
+
+Este projeto já possui um ambiente virtual configurado na pasta `virtualIoTNuvem`. Você só precisa ativá-lo.
+
+**Para ativar no Windows:**
+
+```bash
+.\virtualIoTNuvem\Scripts\activate
+```
+
+**Para ativar no macOS/Linux:**
+
+```bash
+source virtualIoTNuvem/bin/activate
+```
+
+*Após a ativação, o nome `(virtualIoTNuvem)` aparecerá no início do seu terminal.*
+
+### Passo 3: Instale as Dependências
+
+Com o ambiente virtual ativo, instale os pacotes Python necessários.
+
+```bash
+pip install Flask pyserial
+```
+
+### Passo 4: Configure a Porta Serial (❗ Passo Crucial\!)
+
+1.  Conecte seu Arduino ao computador.
+2.  Verifique em qual porta (ex: `COM5` no Windows ou `/dev/ttyUSB0` no Linux) ele está conectado.
+3.  Abra o arquivo `views.py` e **confirme se a variável `PORTA_SERIAL`** está configurada com a porta correta.
+
+<!-- end list -->
+
+```python
+# views.py
+# ...
+PORTA_SERIAL = 'COM5'  # <-- VERIFIQUE E ALTERE ESTA LINHA SE NECESSÁRIO
+# ...
+```
+
+### Passo 5: Inicie o Servidor Flask
+
+Com tudo configurado, inicie a aplicação.
+
+```bash
+python app.py
+```
+
+O terminal deverá exibir mensagens indicando que o servidor está rodando e que a conexão com a porta serial foi bem-sucedida.
+
+### Passo 6: Acesse a Interface de Controle
+
+Abra seu navegador e acesse o endereço:
+
+[http://127.0.0.1:5000](https://www.google.com/search?q=http://127.0.0.1:5000)
+
+Você verá a interface de controle do radar. Teste enviando algumas coordenadas e o comando de retorno\!
+
+-----
+
+## 📂 Estrutura do Projeto
+
+```
+/
+├── app.py              # Inicia o servidor Flask.
+├── views.py            # Contém as rotas e toda a lógica de comunicação com o Arduino.
+├── virtualIoTNuvem/    # Pasta do ambiente virtual com as dependências do projeto.
+├── templates/
+│   └── index.html      # A interface web que o usuário vê.
+└── README.md           # Este arquivo que você está lendo.
+```
+
+-----
+
+Feito com ❤️ por [Seu Nome Aqui].
+
+```
+```
