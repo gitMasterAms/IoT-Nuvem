@@ -1,12 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../static/style.css">
+    <title>Controle de Radar - Arduino</title>
+    <!-- Incluindo Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo customizado para o scrollbar do log */
+        #log-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        #log-box::-webkit-scrollbar-track {
+            background: #2d3748;
+        }
+        #log-box::-webkit-scrollbar-thumb {
+            background-color: #4a5568;
+            border-radius: 10px;
+            border: 2px solid #2d3748;
+        }
+    </style>
 </head>
-<body>
-    <h1>IoT Nuvem</h1>
+<body class="bg-gray-900 text-white font-sans flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-2xl p-8 space-y-6">
+        
+        <!-- Cabeçalho -->
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-cyan-400">Controle de Radar</h1>
+            <p class="text-gray-400 mt-1">Interface Web para Arduino</p>
+        </div>
+
+        <!-- Formulário de Inputs -->
+        <form id="control-form" class="space-y-4">
+            <div>
+                <label for="horizontal" class="block text-sm font-medium text-gray-300 mb-1">Distância Horizontal (cm)</label>
+                <input type="number" id="horizontal" name="horizontal" step="0.1" placeholder="-20 a 20" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+            </div>
+            <div>
+                <label for="vertical" class="block text-sm font-medium text-gray-300 mb-1">Distância Vertical (cm)</label>
+                <input type="number" id="vertical" name="vertical" step="0.1" placeholder="-12 a 12" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+            </div>
+        </form>
+
+        <!-- Botões de Ação -->
+        <div class="flex flex-col sm:flex-row gap-4">
+            <button id="send-distances-btn" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                Enviar Distâncias
+            </button>
+            <button id="send-return-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                Executar Retorno (21)
+            </button>
+        </div>
+
+        <!-- Log de Comunicação -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-300 mb-2">Log de Comunicação</h2>
+            <div id="log-box" class="h-48 bg-gray-900 rounded-lg p-3 overflow-y-auto text-sm font-mono whitespace-pre-wrap">
+                <p class="text-gray-500">Aguardando conexão e comandos...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const form = document.getElementById('control-form');
+        const horizontalInput = document.getElementById('horizontal');
+        const verticalInput = document.getElementById('vertical');
+        const sendDistancesBtn = document.getElementById('send-distances-btn');
+        const sendReturnBtn = document.getElementById('send-return-btn');
+        const logBox = document.getElementById('log-box');
+
+        // Flag para limpar o log inicial na primeira mensagem
+        let firstLog = true;
+
+        /**
+         * Adiciona uma mensagem ao log na tela.
+         * @param {string} text - O texto da mensagem.
+         * @param {string} type - 'sent', 'received', ou 'error'.
+         */
+        function addToLog(text, type = 'info') {
+            if (firstLog) {
+                logBox.innerHTML = '';
+                firstLog = false;
+            }
+            
+            const p = document.createElement('p');
+            let prefix = '';
+            
+            switch(type) {
+                case 'sent':
+                    p.className = 'text-cyan-400';
+                    prefix = '> ';
+                    break;
+                case 'received':
+                    p.className = 'text-lime-400';
+                    prefix = '< Arduino: ';
+                    break;
+                case 'error':
+                    p.className = 'text-red-500';
+                    prefix = '! ';
+                    break;
+                default:
+                    p.className = 'text-gray-400';
+            }
+            
+            p.textContent = prefix + text;
+            logBox.appendChild(p);
+            logBox.scrollTop = logBox.scrollHeight; // Auto-scroll para a última mensagem
+        }
+
+        /**
+         * Função genérica para enviar dados via POST.
+         * @param {string} url - A URL do endpoint.
+         * @param {object} body - O corpo da requisição.
+         */
+        async function postData(url, body = {}) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    addToLog(result.message, 'sent');
+                } else {
+                    addToLog(result.message, 'error');
+                }
+            } catch (error) {
+                addToLog('Falha na comunicação com o servidor.', 'error');
+                console.error('Erro:', error);
+            }
+        }
+
+        // Event listener para o botão de enviar distâncias
+        sendDistancesBtn.addEventListener('click', () => {
+            const h = horizontalInput.value;
+            const v = verticalInput.value;
+
+            if (h === '' || v === '') {
+                addToLog('Ambos os campos de distância devem ser preenchidos.', 'error');
+                return;
+            }
+            postData('/send_command', { h, v });
+        });
+
+        // Event listener para o botão de retorno
+        sendReturnBtn.addEventListener('click', () => {
+            postData('/send_return');
+        });
+
+        /**
+         * Busca novas mensagens do Arduino periodicamente.
+         */
+        async function fetchSerialData() {
+            try {
+                const response = await fetch('/read_serial');
+                const result = await response.json();
+                if (result.data) {
+                    addToLog(result.data, 'received');
+                }
+            } catch (error) {
+                // Não loga erros de polling para não poluir a tela
+                console.error('Erro no polling serial:', error);
+            }
+        }
+
+        // Inicia o polling para ler dados da serial a cada 1 segundo
+        setInterval(fetchSerialData, 1000);
+
+    </script>
 </body>
 </html>
