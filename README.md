@@ -151,3 +151,7 @@ Você verá a interface de controle do radar. Teste enviando algumas coordenadas
 
 Feito pela Turma AMS.
 
+rm -r virtualIoTNuvem
+python3 -m venv virtualIoTNuvem
+source virtualIoTNuvem/bin/activate
+
