@@ -1,9 +1,4 @@
 
------
-
-### Código-fonte para o seu arquivo `README.md`:
-
-```markdown
 # 📡 Controle de Radar: Da Área de Trabalho para a Web 🚀
 
 ### Uma interface web moderna para controlar um radar via Arduino com Flask.
@@ -15,13 +10,13 @@
 
 ## 🎯 O Que é Este Projeto?
 
-Este projeto é uma modernização de um aplicativo de controle de radar. A aplicação original, baseada em uma interface gráfica desktop com Tkinter, foi completamente migrada para uma **plataforma web utilizando Flask**.
+Este projeto moderniza um aplicativo de controle de radar. A aplicação original, que usava uma interface gráfica desktop com Tkinter, foi completamente migrada para uma **plataforma web utilizando Flask**.
 
-O objetivo é permitir o controle de um sistema de radar (conectado a um Arduino) através de qualquer navegador, oferecendo uma experiência de usuário mais flexível, acessível e moderna.
+O objetivo é permitir o controle de um sistema de radar (conectado a um Arduino) por meio de qualquer navegador, oferecendo uma experiência de usuário mais flexível, acessível e moderna.
 
 ## ⚙️ Como Funciona?
 
-A arquitetura conecta a interface web ao hardware físico de forma simples e eficiente:
+A arquitetura conecta a interface web ao hardware de forma simples e eficiente:
 
 ```
 
@@ -37,7 +32,7 @@ v
 v
 [      Porta Serial (COM5)      ]
 |
-(Envia e recebe dados: "15.2 -8.1\\n")
+(Envia e recebe dados: "15.2 -8.1\n")
 |
 v
 [         Arduino UNO         ]
@@ -49,19 +44,19 @@ v
 
 ````
 
-1.  **Frontend (Interface de Controle):** Uma página web limpa, construída com HTML e Tailwind CSS, onde o usuário digita as distâncias horizontal e vertical.
-2.  **Backend (Servidor Flask):** O servidor em Python recebe os dados do navegador, valida as coordenadas (H: -20 a 20, V: -12 a 12) e os formata para envio.
-3.  **A Ponte (PySerial):** Esta biblioteca é a responsável por "traduzir" os comandos do Python para a linguagem que o Arduino entende, enviando-os pela porta serial.
-4.  **Hardware (Arduino):** O microcontrolador recebe os comandos e aciona os motores para posicionar o radar com precisão. Ele também pode enviar mensagens de status de volta para o log da aplicação.
+1. **Frontend (Interface de Controle):** Uma página web limpa, construída com HTML e Tailwind CSS, onde o usuário digita as distâncias horizontal e vertical.
+2. **Backend (Servidor Flask):** O servidor em Python recebe os dados do navegador, valida as coordenadas (H: -20 a 20, V: -12 a 12) e as formata para envio.
+3. **A Ponte (PySerial):** Esta biblioteca traduz os comandos do Python para a linguagem que o Arduino entende, enviando-os pela porta serial.
+4. **Hardware (Arduino):** O microcontrolador recebe os comandos e aciona os motores para posicionar o radar com precisão. Ele também pode enviar mensagens de status de volta para o log da aplicação.
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
--   **Backend:** Python, Flask
--   **Comunicação Hardware:** PySerial
--   **Frontend:** HTML5, Tailwind CSS
--   **Hardware:** Arduino
+- **Backend:** Python, Flask
+- **Comunicação com Hardware:** PySerial
+- **Frontend:** HTML5, Tailwind CSS
+- **Hardware:** Arduino
 
 ---
 
@@ -71,16 +66,16 @@ Siga os passos abaixo para executar a aplicação na sua máquina.
 
 ### Pré-requisitos
 
--   [Python 3.8+](https://www.python.org/downloads/) instalado.
--   Um Arduino com o código de controle já carregado na placa.
--   Git para clonar o projeto.
+- [Python 3.8+](https://www.python.org/downloads/) instalado.
+- Um Arduino com o código de controle já carregado na placa.
+- Git para clonar o projeto.
 
 ### Passo 1: Clone o Repositório
 
 Abra seu terminal e clone este projeto para a sua máquina.
 
 ```bash
-git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
+git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
 cd SEU_REPOSITORIO
 ````
 
@@ -110,13 +105,11 @@ Com o ambiente virtual ativo, instale os pacotes Python necessários.
 pip install Flask pyserial
 ```
 
-### Passo 4: Configure a Porta Serial (❗ Passo Crucial\!)
+### Passo 4: Configure a Porta Serial (❗ Passo Crucial!)
 
-1.  Conecte seu Arduino ao computador.
-2.  Verifique em qual porta (ex: `COM5` no Windows ou `/dev/ttyUSB0` no Linux) ele está conectado.
-3.  Abra o arquivo `views.py` e **confirme se a variável `PORTA_SERIAL`** está configurada com a porta correta.
-
-<!-- end list -->
+1. Conecte seu Arduino ao computador.
+2. Verifique em qual porta (ex: `COM5` no Windows ou `/dev/ttyUSB0` no Linux) ele está conectado.
+3. Abra o arquivo `views.py` e **confirme se a variável `PORTA_SERIAL`** está configurada com a porta correta.
 
 ```python
 # views.py
@@ -139,27 +132,25 @@ O terminal deverá exibir mensagens indicando que o servidor está rodando e que
 
 Abra seu navegador e acesse o endereço:
 
-[http://127.0.0.1:5000](https://www.google.com/search?q=http://127.0.0.1:5000)
+[http://127.0.0.1:5000](http://127.0.0.1:5000)
 
-Você verá a interface de controle do radar. Teste enviando algumas coordenadas e o comando de retorno\!
+Você verá a interface de controle do radar. Teste enviando algumas coordenadas e o comando de retorno!
 
------
+---
 
 ## 📂 Estrutura do Projeto
 
 ```
 /
 ├── app.py              # Inicia o servidor Flask.
-├── views.py            # Contém as rotas e toda a lógica de comunicação com o Arduino.
+├── views.py            # Contém as rotas e a lógica de comunicação com o Arduino.
 ├── virtualIoTNuvem/    # Pasta do ambiente virtual com as dependências do projeto.
 ├── templates/
 │   └── index.html      # A interface web que o usuário vê.
 └── README.md           # Este arquivo que você está lendo.
 ```
 
------
+---
 
 Feito com ❤️ por [Seu Nome Aqui].
 
-```
-```
