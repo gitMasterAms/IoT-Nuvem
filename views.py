@@ -7,7 +7,7 @@ import cv2
 
 # --- CONFIGURAÇÕES DA PORTA SERIAL ---
 # Altere para sua porta, ex: 'COM3' no Windows ou '/dev/ttyUSB0' no Linux
-PORTA_SERIAL = 'COM5'
+PORTA_SERIAL = '/dev/ttyUSB0'
 BAUD_RATE = 9600
 arduino = None  # Variável global para a conexão serial
 
