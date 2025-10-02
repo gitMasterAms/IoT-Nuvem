@@ -1,8 +1,9 @@
-# views.py - Arquivo que gerencia as rotas e a lógica de comunicação com o Arduino.
+# views.py - Arquivo que gerencia as rotas e a lógica de comunicação com o Arduino + streaming da câmera.
 
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, Response
 import serial
 import time
+import cv2
 
 # --- CONFIGURAÇÕES DA PORTA SERIAL ---
 # Altere para sua porta, ex: 'COM3' no Windows ou '/dev/ttyUSB0' no Linux
@@ -10,36 +11,57 @@ PORTA_SERIAL = 'COM5'
 BAUD_RATE = 9600
 arduino = None  # Variável global para a conexão serial
 
-# Tenta estabelecer a conexão com a porta serial
+# --- CONFIGURAÇÃO DA CÂMERA ---
+CAM_SOURCE = 0  # 0 = primeira webcam USB
+camera = cv2.VideoCapture(CAM_SOURCE)
+
+# --- Conexão com Arduino ---
 try:
     arduino = serial.Serial(PORTA_SERIAL, BAUD_RATE, timeout=1)
     time.sleep(2)  # Tempo para a conexão serial ser estabelecida
     print(f"Sucesso: Conectado à porta serial {PORTA_SERIAL}.")
 except serial.SerialException as e:
     print(f"Erro Crítico: Não foi possível conectar à porta serial {PORTA_SERIAL}. {e}")
-    print("Verifique se a porta está correta, se o Arduino está conectado e se nenhum outro programa está usando a porta.")
     arduino = None
 except Exception as e:
     print(f"Um erro inesperado ocorreu: {e}")
     arduino = None
 
-# Cria um "Blueprint" para organizar as rotas
+# Cria o Blueprint
 main_blueprint = Blueprint('main', __name__)
 
 def close_serial_on_exit():
-    """Função para fechar a porta serial de forma segura ao sair."""
+    """Fecha a porta serial de forma segura ao sair."""
     if arduino and arduino.is_open:
         arduino.close()
         print("Conexão serial fechada.")
 
+# --- Função para gerar frames da câmera ---
+def generate_frames():
+    while True:
+        success, frame = camera.read()
+        if not success:
+            continue
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame_bytes = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+# --- Rotas Flask ---
 @main_blueprint.route('/')
 def index():
-    """Renderiza a página HTML principal."""
+    """Renderiza a página principal com o feed da câmera integrado via HTML."""
     return render_template('index.html')
+
+@main_blueprint.route('/video_feed')
+def video_feed():
+    """Rota que fornece o streaming contínuo da câmera (para <img> no HTML)."""
+    return Response(generate_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @main_blueprint.route('/send_command', methods=['POST'])
 def send_command():
-    """Recebe comandos do frontend e os envia para o Arduino."""
+    """Recebe comandos do frontend e envia para o Arduino."""
     if not arduino or not arduino.is_open:
         return jsonify({'status': 'error', 'message': 'Erro: Porta serial não conectada.'}), 500
 
@@ -48,14 +70,12 @@ def send_command():
     v = data.get('v')
 
     try:
-        # Converte para float e valida os valores
         h_float = float(h)
         v_float = float(v)
 
         if not (-20 <= h_float <= 20 and -12 <= v_float <= 12):
             return jsonify({'status': 'error', 'message': 'Distâncias fora do intervalo permitido (H: -20 a 20, V: -12 a 12).'}), 400
 
-        # Formata e envia o comando para o Arduino
         comando = f"{h_float} {v_float}\n"
         arduino.write(comando.encode())
         return jsonify({'status': 'success', 'message': f'Enviado: {comando.strip()}'})
