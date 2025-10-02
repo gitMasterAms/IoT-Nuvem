@@ -1,3 +1,26 @@
-body{
-    background-color: lightcoral;
+/* Estilo customizado para o scrollbar do elemento de log */
+#log-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+#log-box::-webkit-scrollbar-track {
+    background: #111827; /* equivalente ao gray-900/zinc-900 */
+}
+
+#log-box::-webkit-scrollbar-thumb {
+    background-color: #374151; /* equivalente ao gray-700 */
+    border-radius: 10px;
+    border: 2px solid #111827; /* combina com o track */
+}
+
+/* Moldura da área da câmera para destacar no tema preto/vermelho */
+.camera-frame {
+    border: 2px solid #ef4444; /* red-500 para o tema preto/vermelho */
+    border-radius: 0.5rem;     /* rounded-lg */
+}
+
+/* Placeholder para quando não houver imagem carregada */
+.camera-placeholder {
+    background: repeating-conic-gradient(#0b0b0b 0% 25%, #111 0% 50%) 50% / 20px 20px;
+    color: #9ca3af; /* gray-400 */
 }

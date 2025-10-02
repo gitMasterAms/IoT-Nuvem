@@ -4,72 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Radar - Arduino</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Estilo customizado para o scrollbar do log */
-        #log-box::-webkit-scrollbar {
-            width: 8px;
+    <script>
+     
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                brand: {
+                  primary: '#ef4444' // red-500 para botões e destaques
+                }
+              }
+            }
+          }
         }
-        #log-box::-webkit-scrollbar-track {
-            background: #2d3748;
-        }
-        #log-box::-webkit-scrollbar-thumb {
-            background-color: #4a5568;
-            border-radius: 10px;
-            border: 2px solid #2d3748;
-        }
-    </style>
+    </script>
+    <link rel="stylesheet" href="/static/style.css">
+    
 </head>
-<body class="bg-gray-900 text-white font-sans flex items-center justify-center min-h-screen">
+<body class="bg-black text-white font-sans min-h-screen">
 
-    <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-2xl p-8 space-y-6">
+    <!-- Moldura externa em vermelho para remeter ao layout de referência -->
+    <div class="min-h-screen p-4 sm:p-6 md:p-8">
+        <!-- Container central escuro -->
+        <div class="mx-auto max-w-6xl bg-zinc-900 rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 space-y-8">
 
-        <!-- Cabeçalho -->
-        <div class="text-center">
-            <h1 class="text-3xl font-bold text-cyan-400">Controle de Radar</h1>
-            <p class="text-gray-400 mt-1">Interface Web para Arduino</p>
-        </div>
-
-        <!-- Formulário de Inputs -->
-        <form id="control-form" class="space-y-4">
-            <div>
-                <label for="horizontal" class="block text-sm font-medium text-gray-300 mb-1">Distância Horizontal (cm)</label>
-                <input type="number" id="horizontal" name="horizontal" step="0.1" placeholder="-20 a 20" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+            <!-- Cabeçalho -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl"></span>
+                    <h1 class="text-2xl sm:text-3xl font-semibold text-red-500">Controle de Câmera Web</h1>
+                </div>
+                <!-- Indicador de status (decorativo) -->
+                <div class="hidden sm:flex items-center gap-2 bg-zinc-900 text-gray-300 px-4 py-2 rounded-xl ring-1 ring-zinc-800">
+                    <span class="h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                    <span class="text-sm">Câmera Desconectada</span>
+                </div>
             </div>
-            <div>
-                <label for="vertical" class="block text-sm font-medium text-gray-300 mb-1">Distância Vertical (cm)</label>
-                <input type="number" id="vertical" name="vertical" step="0.1" placeholder="-12 a 12" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
-            </div>
-        </form>
 
-        <!-- Stream da Câmera -->
-        <div class="mt-6">
-            <h2 class="text-lg font-semibold text-gray-300 mb-2">Câmera ao Vivo</h2>
-            <div class="bg-gray-900 rounded-lg p-2 flex justify-center overflow-x-auto">
-                <img id="camera-feed" src="{{ url_for('main.video_feed') }}" class="rounded-lg border border-gray-700" width="640" height="480">
+            <!-- Duas colunas: câmera à esquerda, controles à direita -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Esquerda: Área da câmera -->
+                <div class="lg:col-span-8">
+                    <div class="camera-frame bg-zinc-900 p-4 sm:p-6">
+                        <div class="relative w-full">
+                            <img id="camera-image" src="{{ url_for('main.video_feed') }}" alt="Prévia da câmera" class="w-full h-[22rem] md:h-[26rem] object-cover rounded-lg">
+                        </div>
+                    </div>
+
+
+                    <!-- Ações principais abaixo da câmera -->
+                    <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                        <button id="send-distances-btn" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-semibold py-3 px-5 rounded-lg transition duration-300 ease-in-out shadow-md">
+                            <span class="mr-2"></span> Enviar Distâncias
+                        </button>
+                        <button id="send-return-btn" class="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-900 text-white font-semibold py-3 px-5 rounded-lg ring-1 ring-zinc-700 transition duration-300 ease-in-out">
+                             Executar Retorno (21)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Direita: Painel de controles e log -->
+                <div class="lg:col-span-4 space-y-5">
+                    <div class="bg-zinc-900 rounded-xl p-5 ring-1 ring-zinc-800 space-y-4">
+                        <div>
+                            <div class="flex items-center gap-2 text-lg font-semibold">
+                                <span>Movimento Preciso</span>
+                            </div>
+                            <div class="h-px bg-red-600/70 mt-2"></div>
+                        </div>
+
+                        <!-- Formulário (IDs preservados) -->
+                        <form id="control-form" class="space-y-4">
+                            <div>
+                                <label for="horizontal" class="block text-sm font-medium text-gray-300 mb-1">Posição Horizontal (Pan)</label>
+                                <div class="relative">
+                                    <input type="number" id="horizontal" name="horizontal" step="0.1" placeholder="-20 a 20" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-3 pr-8 py-2 text-white focus:ring-2 focus:ring-red-500 focus:outline-none transition">
+                                    <span class="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400">°</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="vertical" class="block text-sm font-medium text-gray-300 mb-1">Posição Vertical (Tilt)</label>
+                                <div class="relative">
+                                    <input type="number" id="vertical" name="vertical" step="0.1" placeholder="-12 a 12" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-3 pr-8 py-2 text-white focus:ring-2 focus:ring-red-500 focus:outline-none transition">
+                                    <span class="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400">°</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Log de Comunicação -->
+                    <div>
+                        <h2 class="text-base font-semibold text-gray-300 mb-2">Log de Comunicação</h2>
+                        <div id="log-box" class="h-48 bg-black rounded-lg p-3 overflow-y-auto text-sm font-mono whitespace-pre-wrap ring-1 ring-zinc-800">
+                            <p class="text-gray-500">Aguardando conexão e comandos...</p>
+                        </div>
+                    </div>
+
+
+
+
+
+                </div>
+
             </div>
         </div>
-
-        <!-- Botões de Ação -->
-        <div class="flex flex-col sm:flex-row gap-4">
-            <button id="send-distances-btn" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
-                Enviar Distâncias
-            </button>
-            <button id="send-return-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
-                Executar Retorno (21)
-            </button>
-        </div>
-
-        <!-- Log de Comunicação -->
-        <div>
-            <h2 class="text-lg font-semibold text-gray-300 mb-2">Log de Comunicação</h2>
-            <div id="log-box" class="h-48 bg-gray-900 rounded-lg p-3 overflow-y-auto text-sm font-mono whitespace-pre-wrap">
-                <p class="text-gray-500">Aguardando conexão e comandos...</p>
-            </div>
-        </div>
-
     </div>
+
+
 
     <script>
         const form = document.getElementById('control-form');
